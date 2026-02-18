@@ -7,6 +7,27 @@ from io import BytesIO
 from PIL import Image
 from streamlit_pdf_viewer import pdf_viewer
 st.set_page_config(layout="wide", page_title="Steel Pole Estimator (鋼管柱積算)")
+# --- パスワード認証機能の追加 ---
+def check_password():
+    if "password_correct" not in st.session_state:
+        st.session_state["password_correct"] = False
+
+    if not st.session_state["password_correct"]:
+        st.write("## 🔒 セキュリティ認証")
+        password = st.text_input("パスワードを入力してください", type="password")
+        if st.button("ログイン"):
+            if password == "yp2026":  # ← ここに好きなパスワードを設定してください
+                st.session_state["password_correct"] = True
+                st.rerun()
+            else:
+                st.error("パスワードが違います")
+        st.info("※このシステムは関係者以外立ち入り禁止です。")
+        return False
+    return True
+
+if not check_password():
+    st.stop()  # パスワードが正しくない場合、これ以降の処理を停止する
+# --- ここまで ---
 
 st.title("🔩 Steel Pole Material Estimation System")
 st.markdown("**(鋼管柱・自動拾い出しシステム)**")
@@ -789,4 +810,5 @@ if uploaded_file:
                 st.download_button("💾 Save Asset (JSON)", json.dumps(save_data, indent=2, ensure_ascii=False), f"{project_name}_asset.json", "application/json")
 else:
     st.info("Please upload a drawing to start.")
+
 
